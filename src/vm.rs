@@ -53,6 +53,14 @@ impl VM {
                 self.registers[register] = number as i32;
                 return None;
             }
+            Opcode::ADD => {
+                let reg1 = self.next_8_bits() as usize;
+                let reg2 = self.next_8_bits() as usize;
+                let result_reg = self.next_8_bits() as usize;
+
+                self.registers[result_reg] = self.registers[reg1] + self.registers[reg2];
+                return None;
+            }
             _ => {
                 eprintln!("Unrecognized opcode found. Terminating!");
                 return Some(-1);
