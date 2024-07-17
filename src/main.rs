@@ -1,3 +1,4 @@
-fn main() {
-    println!("Hello, world!");
-}
+pub mod instruction;
+pub mod vm;
+
+fn main() {}
