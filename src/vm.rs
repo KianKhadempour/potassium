@@ -4,6 +4,7 @@ pub struct VM {
     registers: [i32; 32],
     pc: usize,
     program: Vec<u8>,
+    remainder: u32,
 }
 
 impl VM {
@@ -12,6 +13,7 @@ impl VM {
             registers: [0; 32],
             pc: 0,
             program: vec![],
+            remainder: 0,
         }
     }
 
@@ -59,6 +61,37 @@ impl VM {
                 let result_reg = self.next_8_bits() as usize;
 
                 self.registers[result_reg] = self.registers[reg1] + self.registers[reg2];
+                return None;
+            }
+            Opcode::SUB => {
+                let reg1 = self.next_8_bits() as usize;
+                let reg2 = self.next_8_bits() as usize;
+                let result_reg = self.next_8_bits() as usize;
+
+                self.registers[result_reg] = self.registers[reg1] - self.registers[reg2];
+                return None;
+            }
+            Opcode::MUL => {
+                let reg1 = self.next_8_bits() as usize;
+                let reg2 = self.next_8_bits() as usize;
+                let result_reg = self.next_8_bits() as usize;
+
+                self.registers[result_reg] = self.registers[reg1] * self.registers[reg2];
+                return None;
+            }
+            Opcode::DIV => {
+                let reg1 = self.next_8_bits() as usize;
+                let reg2 = self.next_8_bits() as usize;
+                let result_reg = self.next_8_bits() as usize;
+
+                let divmod = (
+                    self.registers[reg1] / self.registers[reg2],
+                    self.registers[reg1] % self.registers[reg2],
+                );
+
+                self.registers[result_reg] = divmod.0;
+                self.remainder = divmod.1 as u32;
+
                 return None;
             }
             _ => {
