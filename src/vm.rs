@@ -36,7 +36,7 @@ impl VM {
     }
 
     fn execute_instruction(&mut self) -> Option<i8> {
-        if self.pc > self.program.len() {
+        if self.pc >= self.program.len() {
             eprintln!(
                 "Program counter has exceeded program length! Did you forget to include an HLT?"
             );
@@ -159,9 +159,45 @@ mod tests {
     #[test]
     fn test_opcode_load() {
         let mut test_vm = VM::new();
-        test_vm.program = vec![1, 0, 1, 244];
+        test_vm.program = vec![1, 0, 1, 244, 0];
 
         test_vm.run();
         assert_eq!(test_vm.registers[0], 500);
+    }
+
+    #[test]
+    fn test_opcode_add() {
+        let mut test_vm = VM::new();
+        test_vm.program = vec![1, 0, 1, 244, 1, 1, 0, 250, 2, 0, 1, 3, 0];
+
+        test_vm.run();
+        assert_eq!(test_vm.registers[3], 750);
+    }
+
+    #[test]
+    fn test_opcode_sub() {
+        let mut test_vm = VM::new();
+        test_vm.program = vec![1, 0, 1, 244, 1, 1, 0, 250, 3, 0, 1, 3, 0];
+
+        test_vm.run();
+        assert_eq!(test_vm.registers[3], 250);
+    }
+    #[test]
+    fn test_opcode_mul() {
+        let mut test_vm = VM::new();
+        test_vm.program = vec![1, 0, 0, 8, 1, 1, 0, 6, 4, 0, 1, 3, 0];
+
+        test_vm.run();
+        assert_eq!(test_vm.registers[3], 48);
+    }
+
+    #[test]
+    fn test_opcode_div() {
+        let mut test_vm = VM::new();
+        test_vm.program = vec![1, 0, 0, 8, 1, 1, 0, 6, 5, 0, 1, 3, 0];
+
+        test_vm.run();
+        assert_eq!(test_vm.registers[3], 1);
+        assert_eq!(test_vm.remainder, 2);
     }
 }
