@@ -247,7 +247,9 @@ mod tests {
     #[test]
     fn test_opcode_hlt() {
         let mut test_vm = VM::new();
-        test_vm.set_program(vec![[0, 0, 0, 0]]);
+        test_vm.set_program(vec![
+            [0, 0, 0, 0], // Halt
+        ]);
 
         assert_eq!(test_vm.decode_opcode(), Opcode::HLT);
         assert_eq!(test_vm.pc, 1);
@@ -256,7 +258,9 @@ mod tests {
     #[test]
     fn test_opcode_igl() {
         let mut test_vm = VM::new();
-        test_vm.set_program(vec![[200, 0, 0, 0]]);
+        test_vm.set_program(vec![
+            [200, 0, 0, 0], // Invalid opcode
+        ]);
 
         assert_eq!(test_vm.decode_opcode(), Opcode::IGL);
         assert_eq!(test_vm.pc, 1);
@@ -265,7 +269,10 @@ mod tests {
     #[test]
     fn test_opcode_load() {
         let mut test_vm = VM::new();
-        test_vm.set_program(vec![[1, 0, 1, 244], [0, 0, 0, 0]]);
+        test_vm.set_program(vec![
+            [1, 0, 1, 244], // Set reg0 to 500
+            [0, 0, 0, 0],   // Halt
+        ]);
 
         test_vm.run();
         assert_eq!(test_vm.registers[0], 500);
@@ -275,52 +282,65 @@ mod tests {
     fn test_opcode_add() {
         let mut test_vm = VM::new();
         test_vm.set_program(vec![
-            [1, 0, 1, 244],
-            [1, 1, 0, 250],
-            [2, 0, 1, 3],
-            [0, 0, 0, 0],
+            [1, 0, 1, 244], // Set reg0 to 500
+            [1, 1, 0, 250], // Set reg1 to 250
+            [2, 0, 1, 2],   // Set reg2 to reg0 + reg2
+            [0, 0, 0, 0],   // Halt
         ]);
 
         test_vm.run();
-        assert_eq!(test_vm.registers[3], 750);
+        assert_eq!(test_vm.registers[2], 750);
     }
 
     #[test]
     fn test_opcode_sub() {
         let mut test_vm = VM::new();
         test_vm.set_program(vec![
-            [1, 0, 1, 244],
-            [1, 1, 0, 250],
-            [3, 0, 1, 3],
-            [0, 0, 0, 0],
+            [1, 0, 1, 244], // Set reg0 to 500
+            [1, 1, 0, 250], // Set reg1 to 250
+            [3, 0, 1, 2],   // Set reg2 to reg0 - reg1
+            [0, 0, 0, 0],   // Halt
         ]);
 
         test_vm.run();
-        assert_eq!(test_vm.registers[3], 250);
+        assert_eq!(test_vm.registers[2], 250);
     }
     #[test]
     fn test_opcode_mul() {
         let mut test_vm = VM::new();
-        test_vm.set_program(vec![[1, 0, 0, 8], [1, 1, 0, 6], [4, 0, 1, 3], [0, 0, 0, 0]]);
+        test_vm.set_program(vec![
+            [1, 0, 0, 8], // Set reg0 to 8
+            [1, 1, 0, 6], // Set reg1 to 6
+            [4, 0, 1, 2], // Set reg2 to reg0 * reg1
+            [0, 0, 0, 0], // Halt
+        ]);
 
         test_vm.run();
-        assert_eq!(test_vm.registers[3], 48);
+        assert_eq!(test_vm.registers[2], 48);
     }
 
     #[test]
     fn test_opcode_div() {
         let mut test_vm = VM::new();
-        test_vm.set_program(vec![[1, 0, 0, 8], [1, 1, 0, 6], [5, 0, 1, 3], [0, 0, 0, 0]]);
+        test_vm.set_program(vec![
+            [1, 0, 0, 8], // Set reg0 to 8
+            [1, 1, 0, 6], // Set reg1 to 6
+            [5, 0, 1, 2], // Set reg2 to reg0 / reg1 and remainder to reg0 % reg1
+            [0, 0, 0, 0], // Halt
+        ]);
 
         test_vm.run();
-        assert_eq!(test_vm.registers[3], 1);
+        assert_eq!(test_vm.registers[2], 1);
         assert_eq!(test_vm.remainder, 2);
     }
 
     #[test]
     fn test_opcode_jmp() {
         let mut test_vm = VM::new();
-        test_vm.set_program(vec![[1, 0, 0, 0], [6, 0, 0, 0]]);
+        test_vm.set_program(vec![
+            [1, 0, 0, 0], // Set reg0 to 0
+            [6, 0, 0, 0], // Jump to reg0
+        ]);
 
         test_vm.run_once();
         test_vm.run_once();
@@ -330,7 +350,10 @@ mod tests {
     #[test]
     fn test_opcode_jmpf() {
         let mut test_vm = VM::new();
-        test_vm.set_program(vec![[1, 0, 0, 8], [7, 0, 0, 0]]);
+        test_vm.set_program(vec![
+            [1, 0, 0, 8], // Set reg0 to 8
+            [7, 0, 0, 0], // Jump forward reg0
+        ]);
 
         test_vm.run_once();
         test_vm.run_once();
@@ -340,7 +363,10 @@ mod tests {
     #[test]
     fn test_opcode_jmpb() {
         let mut test_vm = VM::new();
-        test_vm.set_program(vec![[1, 0, 0, 6], [8, 0, 0, 0]]);
+        test_vm.set_program(vec![
+            [1, 0, 0, 6], // Set reg0 to 6
+            [8, 0, 0, 0], // Jump backward reg0
+        ]);
 
         test_vm.run_once();
         test_vm.run_once();
@@ -351,11 +377,11 @@ mod tests {
     fn test_opcode_eq() {
         let mut test_vm = VM::new();
         test_vm.set_program(vec![
-            [1, 0, 0, 6],
-            [1, 1, 0, 6],
-            [9, 0, 1, 0],
-            [1, 1, 0, 7],
-            [9, 0, 1, 0],
+            [1, 0, 0, 6], // Set reg0 to 6
+            [1, 1, 0, 6], // Set reg1 to 6
+            [9, 0, 1, 0], // Set equal_flag to reg0 == reg1
+            [1, 1, 0, 7], // Set reg1 to 7
+            [9, 0, 1, 0], // Set equal_flag to reg0 == reg1
         ]);
 
         test_vm.run_once();
@@ -371,11 +397,11 @@ mod tests {
     fn test_opcode_neq() {
         let mut test_vm = VM::new();
         test_vm.set_program(vec![
-            [1, 0, 0, 6],
-            [1, 1, 0, 6],
-            [10, 0, 1, 0],
-            [1, 1, 0, 7],
-            [10, 0, 1, 0],
+            [1, 0, 0, 6],  // Set reg0 to 6
+            [1, 1, 0, 6],  // Set reg1 to 6
+            [10, 0, 1, 0], // Set equal_flag to reg0 != reg1
+            [1, 1, 0, 7],  // Set reg1 to 7
+            [10, 0, 1, 0], // Set equal_flag to reg0 == reg1
         ]);
 
         test_vm.run_once();
@@ -391,13 +417,13 @@ mod tests {
     fn test_opcode_gt() {
         let mut test_vm = VM::new();
         test_vm.set_program(vec![
-            [1, 0, 0, 6],
-            [1, 1, 0, 7],
-            [11, 0, 1, 0],
-            [1, 1, 0, 5],
-            [11, 0, 1, 0],
-            [1, 1, 0, 6],
-            [11, 0, 1, 0],
+            [1, 0, 0, 6],  // Set reg0 to 6
+            [1, 1, 0, 7],  // Set reg1 to 7
+            [11, 0, 1, 0], // Set equal_flag to reg0 > reg1
+            [1, 1, 0, 5],  // Set reg1 to 5
+            [11, 0, 1, 0], // Set equal_flag to reg0 > reg1
+            [1, 1, 0, 6],  // Set reg1 to 6
+            [11, 0, 1, 0], // Set equal_flag to reg0 > reg1
         ]);
 
         test_vm.run_once();
@@ -416,13 +442,13 @@ mod tests {
     fn test_opcode_lt() {
         let mut test_vm = VM::new();
         test_vm.set_program(vec![
-            [1, 0, 0, 6],
-            [1, 1, 0, 7],
-            [12, 0, 1, 0],
-            [1, 1, 0, 5],
-            [12, 0, 1, 0],
-            [1, 1, 0, 6],
-            [12, 0, 1, 0],
+            [1, 0, 0, 6],  // Set reg0 to 6
+            [1, 1, 0, 7],  // Set reg1 to 7
+            [12, 0, 1, 0], // Set equal_flag to reg0 < reg1
+            [1, 1, 0, 5],  // Set reg1 to 5
+            [12, 0, 1, 0], // Set equal_flag to reg0 < reg1
+            [1, 1, 0, 6],  // Set reg1 to 6
+            [12, 0, 1, 0], // Set equal_flag to reg0 < reg1
         ]);
 
         test_vm.run_once();
@@ -441,13 +467,13 @@ mod tests {
     fn test_opcode_gtq() {
         let mut test_vm = VM::new();
         test_vm.set_program(vec![
-            [1, 0, 0, 6],
-            [1, 1, 0, 7],
-            [13, 0, 1, 0],
-            [1, 1, 0, 5],
-            [13, 0, 1, 0],
-            [1, 1, 0, 6],
-            [13, 0, 1, 0],
+            [1, 0, 0, 6],  // Set reg0 to 6
+            [1, 1, 0, 7],  // Set reg1 to 7
+            [13, 0, 1, 0], // Set equal_flag to reg0 >= reg1
+            [1, 1, 0, 5],  // Set reg1 to 5
+            [13, 0, 1, 0], // Set equal_flag to reg0 >= reg1
+            [1, 1, 0, 6],  // Set reg1 to 6
+            [13, 0, 1, 0], // Set equal_flag to reg0 >= reg1
         ]);
 
         test_vm.run_once();
@@ -466,13 +492,13 @@ mod tests {
     fn test_opcode_ltq() {
         let mut test_vm = VM::new();
         test_vm.set_program(vec![
-            [1, 0, 0, 6],
-            [1, 1, 0, 7],
-            [14, 0, 1, 0],
-            [1, 1, 0, 5],
-            [14, 0, 1, 0],
-            [1, 1, 0, 6],
-            [14, 0, 1, 0],
+            [1, 0, 0, 6],  // Set reg0 to 6
+            [1, 1, 0, 7],  // Set reg1 to 7
+            [14, 0, 1, 0], // Set equal_flag to reg0 <= reg1
+            [1, 1, 0, 5],  // Set reg1 to 5
+            [14, 0, 1, 0], // Set equal_flag to reg0 <= reg1
+            [1, 1, 0, 6],  // Set reg1 to 6
+            [14, 0, 1, 0], // Set equal_flag to reg0 <= reg1
         ]);
 
         test_vm.run_once();
@@ -491,16 +517,16 @@ mod tests {
     fn test_opcode_jeq() {
         let mut test_vm = VM::new();
         test_vm.set_program(vec![
-            [1, 0, 0, 6],
-            [1, 1, 0, 7],
-            [12, 0, 1, 0],
-            [1, 2, 0, 24],
-            [15, 2, 0, 0],
-            [0, 0, 0, 0],
-            [1, 1, 0, 5],
-            [12, 0, 1, 0],
-            [1, 2, 0, 4],
-            [15, 2, 0, 0],
+            [1, 0, 0, 6],  // Set reg0 to 6
+            [1, 1, 0, 7],  // Set reg1 to 7
+            [12, 0, 1, 0], // Set equal_flag to reg0 < reg1
+            [1, 2, 0, 24], // Set reg2 to 24
+            [15, 2, 0, 0], // Jump to reg2 if equal_flag
+            [0, 0, 0, 0],  // Halt
+            [1, 1, 0, 5],  // Set reg1 to 5
+            [12, 0, 1, 0], // Set equal_flag to reg0 < reg1
+            [1, 2, 0, 4],  // Set reg2 to 4
+            [15, 2, 0, 0], // Jump to reg2 if equal_flag
         ]);
 
         test_vm.run_once();
@@ -520,15 +546,15 @@ mod tests {
     fn test_opcode_jneq() {
         let mut test_vm = VM::new();
         test_vm.set_program(vec![
-            [1, 0, 0, 6],
-            [1, 1, 0, 7],
-            [12, 0, 1, 0],
-            [1, 2, 0, 24],
-            [16, 2, 0, 0],
-            [1, 1, 0, 5],
-            [12, 0, 1, 0],
-            [1, 2, 0, 4],
-            [16, 2, 0, 0],
+            [1, 0, 0, 6],  // Set reg0 to 6
+            [1, 1, 0, 7],  // Set reg1 to 7
+            [12, 0, 1, 0], // Set equal_flag to reg0 < reg1
+            [1, 2, 0, 24], // Set reg2 to 24
+            [16, 2, 0, 0], // Jump to reg2 if !equal_flag
+            [1, 1, 0, 5],  // Set reg1 to 5
+            [12, 0, 1, 0], // Set equal_flag to reg0 < reg1
+            [1, 2, 0, 4],  // Set reg2 to 4
+            [16, 2, 0, 0], // Jump to reg2 if !equal_flag
         ]);
 
         test_vm.run_once();
