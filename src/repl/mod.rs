@@ -1,6 +1,5 @@
 use crate::vm::VM;
 use std::{
-    error,
     io::{self, Write},
     num::ParseIntError,
 };
