@@ -1,11 +1,11 @@
 use crate::instruction::Opcode;
 
 pub struct VM {
-    registers: [i32; 32],
-    pc: usize,
-    program: Vec<u8>,
-    remainder: u32,
-    equal_flag: bool,
+    pub registers: [i32; 32],
+    pub pc: usize,
+    pub program: Vec<u8>,
+    pub remainder: u32,
+    pub equal_flag: bool,
 }
 
 impl VM {

@@ -46,7 +46,7 @@ impl From<u8> for Opcode {
 }
 
 pub struct Instruction {
-    opcode: Opcode,
+    pub opcode: Opcode,
 }
 
 impl Instruction {
