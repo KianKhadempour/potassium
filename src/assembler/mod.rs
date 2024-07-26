@@ -13,13 +13,13 @@ pub enum ParseError {
 
 impl Display for ParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use ParseError::*;
+        use ParseError as PE;
         match self {
-            EmptyStringError => write!(f, "The string you provided was empty"),
-            InvalidOpcodeError(s) => write!(f, "The opcode '{}' does not exist", s),
-            MissingRegisterSignError => write!(f, "Registers must start with '$'"),
-            MissingIntegerSignError => write!(f, "Integers must start with '#'"),
-            ParseIntError(e) => write!(f, "There was an error parsing the input: {}", e),
+            PE::EmptyStringError => write!(f, "The string you provided was empty"),
+            PE::InvalidOpcodeError(s) => write!(f, "The opcode '{}' does not exist", s),
+            PE::MissingRegisterSignError => write!(f, "Registers must start with '$'"),
+            PE::MissingIntegerSignError => write!(f, "Integers must start with '#'"),
+            PE::ParseIntError(e) => write!(f, "There was an error parsing the input: {}", e),
         }
     }
 }
