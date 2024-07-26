@@ -52,8 +52,8 @@ impl REPL {
                     println!("pc: {}", self.vm.pc);
                     println!("rem: {}", self.vm.remainder);
                     println!("bool: {}", self.vm.equal_flag);
-                    for register in self.vm.registers.into_iter().enumerate() {
-                        println!("reg{}: {}", register.0, register.1);
+                    for (n, value) in self.vm.registers.into_iter().enumerate() {
+                        println!("reg{}: {}", n, value);
                     }
                 }
                 _ => {
