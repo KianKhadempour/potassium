@@ -1,6 +1,6 @@
 use std::{error::Error, fmt::Display, num::ParseIntError};
 
-use crate::instruction::Opcode;
+use crate::opcode::Opcode;
 
 #[derive(Debug, PartialEq)]
 pub enum ParseError {

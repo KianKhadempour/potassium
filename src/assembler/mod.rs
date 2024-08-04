@@ -1,6 +1,7 @@
 use lexer::Lexer;
 use token::ParseError;
 
+mod instruction;
 mod lexer;
 mod token;
 
