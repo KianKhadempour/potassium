@@ -1,8 +1,10 @@
 use lexer::Lexer;
+use parser::Parser;
 use token::ParseError;
 
 mod instruction;
 mod lexer;
+mod parser;
 mod token;
 
 struct Assembler {
@@ -18,7 +20,8 @@ impl Assembler {
 
     pub fn assemble(&mut self) -> Result<Vec<[u8; 4]>, ParseError> {
         let tokens = self.lexer.lex()?;
+        let instructions = Parser::new(tokens).parse()?;
 
-        todo!()
+        todo!();
     }
 }
