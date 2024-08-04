@@ -1,5 +1,6 @@
 use crate::opcode::Opcode;
 
+#[derive(Debug, PartialEq)]
 pub enum Instruction {
     HLT,
     LOAD(u8, i32),

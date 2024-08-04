@@ -85,27 +85,27 @@ impl Parser {
                     }
                     (O::EQ, Some(T::Register(reg1)), Some(T::Register(reg2)), _) => {
                         output.push(Instruction::EQ(*reg1, *reg2));
-                        pos += 2;
+                        pos += 3;
                     }
                     (O::NEQ, Some(T::Register(reg1)), Some(T::Register(reg2)), _) => {
                         output.push(Instruction::NEQ(*reg1, *reg2));
-                        pos += 2;
+                        pos += 3;
                     }
                     (O::GT, Some(T::Register(reg1)), Some(T::Register(reg2)), _) => {
                         output.push(Instruction::GT(*reg1, *reg2));
-                        pos += 2;
+                        pos += 3;
                     }
                     (O::LT, Some(T::Register(reg1)), Some(T::Register(reg2)), _) => {
                         output.push(Instruction::LT(*reg1, *reg2));
-                        pos += 2;
+                        pos += 3;
                     }
                     (O::GTQ, Some(T::Register(reg1)), Some(T::Register(reg2)), _) => {
                         output.push(Instruction::GTQ(*reg1, *reg2));
-                        pos += 2;
+                        pos += 3;
                     }
                     (O::LTQ, Some(T::Register(reg1)), Some(T::Register(reg2)), _) => {
                         output.push(Instruction::LTQ(*reg1, *reg2));
-                        pos += 2;
+                        pos += 3;
                     }
                     _ => {
                         return Err(ParseError::InvalidOpcodeError(
@@ -121,6 +121,57 @@ impl Parser {
             }
         }
 
-        return Ok(vec![]);
+        return Ok(output);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        assembler::{instruction::Instruction, parser::Parser, token::Token, ParseError},
+        opcode::Opcode,
+    };
+
+    #[test]
+    fn test_parser() {
+        use crate::opcode::Opcode;
+
+        let input = vec![
+            Token::Op(Opcode::LOAD),
+            Token::Register(0),
+            Token::IntegerOperand(500),
+        ];
+
+        let parser = Parser::new(input);
+
+        let expected_output = vec![Instruction::LOAD(0, 500)];
+
+        assert_eq!(parser.parse(), Ok(expected_output))
+    }
+    #[test]
+    fn test_parser_failure_1() {
+        let input = vec![Token::Register(0), Token::IntegerOperand(500)];
+
+        let parser = Parser::new(input);
+
+        assert_eq!(
+            parser.parse(),
+            Err(ParseError::InvalidOpcodeError(
+                "instruction must start with an opcode".to_owned(),
+            ))
+        )
+    }
+    #[test]
+    fn test_parser_failure_2() {
+        let input = vec![Token::Op(Opcode::LOAD), Token::IntegerOperand(500)];
+
+        let parser = Parser::new(input);
+
+        assert_eq!(
+            parser.parse(),
+            Err(ParseError::InvalidOpcodeError(
+                "sequence of opcodes could not be parsed to instruction".to_owned(),
+            ))
+        )
     }
 }
