@@ -17,7 +17,7 @@ impl REPL {
         }
     }
 
-    pub fn run(&mut self) -> ! {
+    pub fn start(&mut self) -> ! {
         println!("Welcome to the potassium REPL");
 
         loop {
@@ -47,6 +47,9 @@ impl REPL {
                     for instruction in self.vm.program.chunks(4) {
                         println!("{:02X?}", instruction);
                     }
+                }
+                ".run" => {
+                    self.vm.run();
                 }
                 ".registers" => {
                     println!("pc: {}", self.vm.pc);
