@@ -107,6 +107,14 @@ impl Parser {
                         output.push(Instruction::LTQ(*reg1, *reg2));
                         pos += 3;
                     }
+                    (O::JEQ, Some(T::Register(reg)), _, _) => {
+                        output.push(Instruction::JEQ(*reg));
+                        pos += 2;
+                    }
+                    (O::JNEQ, Some(T::Register(reg)), _, _) => {
+                        output.push(Instruction::JNEQ(*reg));
+                        pos += 2;
+                    }
                     _ => {
                         return Err(ParseError::InvalidOpcodeError(
                             "sequence of opcodes could not be parsed to instruction".to_owned(),
