@@ -3,4 +3,7 @@ pub mod opcode;
 pub mod repl;
 pub mod vm;
 
-fn main() {}
+fn main() {
+    let mut repl = repl::REPL::new();
+    repl.start();
+}

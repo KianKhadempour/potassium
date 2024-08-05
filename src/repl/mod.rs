@@ -1,4 +1,4 @@
-use crate::vm::VM;
+use crate::{assembler::assemble, vm::VM};
 use std::{
     io::{self, Write},
     num::ParseIntError,
@@ -34,7 +34,7 @@ impl REPL {
             let buffer = buffer.trim();
 
             match buffer {
-                ".quit" => {
+                ".quit" | ".exit" => {
                     println!("Exiting the potassium REPL.");
                     std::process::exit(0);
                 }
@@ -60,7 +60,29 @@ impl REPL {
                     }
                 }
                 _ => {
-                    if let Ok(instruction) = parse_hex(buffer) {
+                    if let Some(filename) = buffer.strip_prefix(".load ") {
+                        if let Ok(file) = std::fs::read_to_string(filename) {
+                            if let Ok(instructions) = assemble(&file) {
+                                self.vm.set_program(instructions);
+                                self.vm.pc = 0;
+                            } else {
+                                println!("Failed to assemble program");
+                            }
+                        } else {
+                            println!("Failed to read file");
+                        }
+                    } else if let Some(reg) = buffer.strip_prefix(".reg").map(|s| s.trim()) {
+                        if let Ok(reg) = reg.parse::<usize>() {
+                            println!("reg{}: {}", reg, self.vm.registers[reg]);
+                        } else {
+                            println!("Invalid register number");
+                        }
+                    } else if let Ok(instruction) = assemble(buffer) {
+                        self.vm
+                            .program
+                            .append(&mut instruction.into_iter().flatten().collect());
+                        self.vm.run_once();
+                    } else if let Ok(instruction) = parse_hex(buffer) {
                         self.vm.program.append(&mut instruction.clone());
                         self.vm.run_once();
                     } else {
